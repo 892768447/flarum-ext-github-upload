@@ -18,7 +18,7 @@ export default class UploadSettingsModal extends SettingsModal {
                 <input
                     required
                     className="FormControl"
-                    bidi={this.setting("flarum-ext-github-upload.token")}
+                    bidi={this.setting("irony.github.upload.token")}
                 />
             </div>,
 
@@ -31,7 +31,7 @@ export default class UploadSettingsModal extends SettingsModal {
                 <input
                     required
                     className="FormControl"
-                    bidi={this.setting("flarum-ext-github-upload.projects")}
+                    bidi={this.setting("irony.github.upload.projects")}
                 />
             </div>,
 
@@ -44,7 +44,7 @@ export default class UploadSettingsModal extends SettingsModal {
                 <input
                     required
                     className="FormControl"
-                    bidi={this.setting("flarum-ext-github-upload.maxsize")}
+                    bidi={this.setting("irony.github.upload.maxsize")}
                 />
             </div>,
 
@@ -57,7 +57,7 @@ export default class UploadSettingsModal extends SettingsModal {
                 <input
                     type="checkbox"
                     className="FormControl"
-                    bidi={this.setting("flarum-ext-github-upload.watermark")}
+                    bidi={this.setting("irony.github.upload.watermark")}
                 />
             </div>
         ];

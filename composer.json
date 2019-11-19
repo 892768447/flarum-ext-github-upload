@@ -40,9 +40,6 @@
     "autoload": {
         "psr-4": {
             "Irony\\Github\\Upload\\": "src/"
-        },
-        "files": [
-            "src/Helpers/functions.php"
-        ]
+        }
     }
 }

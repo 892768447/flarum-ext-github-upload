@@ -50,46 +50,7 @@ class Settings
      * @var array
      */
     protected $definition = [
-        'mimeTypes',
-        'templates',
-
-        // Images
-        'mustResize',
-        'resizeMaxWidth',
-        'cdnUrl',
-
-        // Watermarks
-        'addsWatermarks',
-        'watermarkPosition',
         'watermark',
-
-        // Override avatar upload
-        'overrideAvatarUpload',
-
-        // Imgur
-        'imgurClientId',
-
-        // AWS
-        'awsS3Key',
-        'awsS3Secret',
-        'awsS3Bucket',
-        'awsS3Region',
-
-        // OVH
-        'ovhUsername',
-        'ovhPassword',
-        'ovhTenantId',
-        'ovhContainer',
-        'ovhRegion',
-
-        // Downloads
-        'disableHotlinkProtection',
-        'disableDownloadLogging',
-
-        //QiNiu
-        'qiniuKey',
-        'qiniuSecret',
-        'qiniuBucket',
     ];
 
     protected $prefix = 'irony.github.upload.';

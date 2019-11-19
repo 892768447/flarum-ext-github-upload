@@ -21,13 +21,7 @@ return [
     new Extend\Locales(__DIR__ . '/resources/locale'),
 
     function (Dispatcher $events, Application $app) {
-        $app->register(Providers\SettingsProvider::class);
-        $app->register(Providers\StorageServiceProvider::class);
-
         $events->subscribe(Listeners\AddUploadsApi::class);
-        $events->subscribe(Listeners\LoadSettingsFromDatabase::class);
         $events->subscribe(Listeners\ProcessesImages::class);
-
-        $events->subscribe(Listeners\AddDeprecatedTemplates::class);
     },
 ];

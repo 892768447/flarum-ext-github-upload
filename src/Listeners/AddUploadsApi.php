@@ -1,16 +1,5 @@
 <?php
 
-/*
- * This file is part of flagrow/upload.
- *
- * Copyright (c) Flagrow.
- *
- * http://flagrow.github.io
- *
- * For the full copyright and license information, please view the license.md
- * file that was distributed with this source code.
- */
-
 namespace Irony\Github\Upload\Listeners;
 
 use Flarum\Api\Event\Serializing;
@@ -38,7 +27,6 @@ class AddUploadsApi
     {
         if ($event->isSerializer(ForumSerializer::class)) {
             $event->attributes['canUpload'] = $event->actor->can('irony.github.upload');
-            $event->attributes['canDownload'] = $event->actor->can('irony.github.upload.download');
         }
     }
 }
