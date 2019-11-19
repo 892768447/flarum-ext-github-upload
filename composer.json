@@ -1,0 +1,48 @@
+{
+    "name": "irony/flarum-ext-github-upload",
+    "description": "The file upload extension for the Flarum forum with github upload",
+    "keywords": [
+        "upload",
+        "flarum",
+        "github",
+        "file"
+    ],
+    "type": "flarum-extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Irony",
+            "email": "892768447@qq.com",
+            "homepage": "https://pyqt.site/"
+        }
+    ],
+    "require": {
+        "flarum/core": "^0.1.0-beta.8"
+    },
+    "support": {
+        "issues": "https://github.com/892768447/flarum-ext-github-upload/issues",
+        "source": "https://github.com/892768447/flarum-ext-github-upload"
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "Upload File To Github",
+            "icon": {
+                "image": "fas fa-cloud-upload-alt",
+                "backgroundColor": "#000",
+                "color": "#fff"
+            }
+        },
+        "flagrow": {
+            "discuss": "",
+            "github": "https://github.com/892768447/flarum-ext-github-upload"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Irony\\Github\\Upload\\": "src/"
+        },
+        "files": [
+            "src/Helpers/functions.php"
+        ]
+    }
+}

@@ -1,0 +1,15 @@
+flarum-ext-github-upload:
+  forum:
+    buttons:
+      attach: 添加附件
+    states:
+      loading: 加载中
+      success: 成功
+      error: 错误
+  admin:
+    settings:
+      title: 文件上传设定
+      token_label: Github Token
+      projects_label: Github 储存项目 (用,分开)
+      maxsize_label: 最大文件大小 (单位为 KB)
+      watermark_label: 是否开启水印

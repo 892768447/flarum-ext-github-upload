@@ -1,0 +1,15 @@
+flarum-ext-github-upload:
+  forum:
+    buttons:
+      attach: Attach
+    states:
+      error: Error
+      loading: Loading
+      success: Success
+  admin:
+    settings:
+      title: Upload Settings
+      token_label: Github Token
+      projects_label: Github Projects (split with ,)
+      maxsize_label: Maximum file size (in kilobytes)
+      watermark_label: With Watermark
