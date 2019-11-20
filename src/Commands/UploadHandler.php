@@ -6,7 +6,6 @@ use Exception;
 use Irony\Github\Upload\Contracts\UploadAdapter;
 use Irony\Github\Upload\Events;
 use Irony\Github\Upload\File;
-use Irony\Github\Upload\Helpers\Settings;
 use Irony\Github\Upload\Repositories\FileRepository;
 use Flarum\Foundation\Application;
 use Flarum\Foundation\ValidationException;

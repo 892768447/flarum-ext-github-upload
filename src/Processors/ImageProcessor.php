@@ -4,7 +4,6 @@ namespace Irony\Github\Upload\Processors;
 
 use Irony\Github\Upload\Contracts\Processable;
 use Irony\Github\Upload\File;
-use Irony\Github\Upload\Helpers\Settings;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

@@ -3,7 +3,6 @@
 namespace Irony\Github\Upload\Api\Serializers;
 
 use Irony\Github\Upload\File;
-use Irony\Github\Upload\Helpers\Settings;
 use Flarum\Api\Serializer\AbstractSerializer;
 use Flarum\Formatter\Formatter;
 use Illuminate\Support\Arr;

@@ -4,7 +4,6 @@ namespace Irony\Github\Upload\Adapters;
 
 use Irony\Github\Upload\Contracts\UploadAdapter;
 use Irony\Github\Upload\File;
-use Irony\Github\Upload\Helpers\Settings;
 use Flarum\Http\UrlGenerator;
 
 class Local extends Flysystem implements UploadAdapter
