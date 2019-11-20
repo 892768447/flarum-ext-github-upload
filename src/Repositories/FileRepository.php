@@ -2,73 +2,70 @@
 
 namespace Irony\Github\Upload\Repositories;
 
-use Carbon\Carbon;
+use Exception;
 use Irony\Github\Upload\Commands\Download as DownloadCommand;
 use Irony\Github\Upload\Contracts\UploadAdapter;
 use Irony\Github\Upload\Download;
-use Irony\Github\Upload\Exceptions\InvalidUploadException;
 use Irony\Github\Upload\File;
-use Irony\Github\Upload\Validators\UploadValidator;
 use Flarum\Foundation\Application;
 use Flarum\User\User;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 
 class FileRepository
 {
+    const DEFAULT_MAX_FILE_SIZE = 1024;
+
     /**
      * @var string
      */
     protected $path;
-    /**
-     * @var UploadValidator
-     */
-    private $validator;
 
-    public function __construct(Application $app, UploadValidator $validator)
+    /**
+     * @var SettingsRepositoryInterface
+     */
+    protected $settings;
+
+    public function __construct(Application $app, SettingsRepositoryInterface $settings)
     {
         $this->path = $app->storagePath();
-        $this->validator = $validator;
+        $this->settings = $settings;
     }
 
     /**
-     * @param $uuid
+     * @param $md5
      *
      * @return File
      */
-    public function findByUuid($uuid)
+    public function findByMd5($md5)
     {
         return File::query()
-            ->with('downloads')
-            ->where('uuid', $uuid)
+            ->where('md5', $md5)
             ->first();
     }
 
     /**
      * @param Upload $file
-     * @param User   $actor
+     * @param User $actor
      *
      * @return File
      */
     public function createFileFromUpload(Upload $file, User $actor)
     {
-        // Generate a guaranteed unique Uuid.
-        while ($uuid = Uuid::uuid4()->toString()) {
-            if (!$this->findByUuid($uuid)) {
-                break;
-            }
-        }
+        // unique file md5
+        // 比对文件md5值
+        $md5 = md5_file($file->getPathname());
+        $efile = $this->findByMd5($md5);
+        if ($efile)
+            return $efile;
 
         return (new File())->forceFill([
-            'uuid'      => $uuid,
-            'base_name' => $this->getBasename($file, $uuid),
-            'size'      => $file->getSize(),
-            'type'      => $file->getClientMimeType(),
-            'actor_id'  => $actor->id,
+            'md5' => $md5,
+            'actor_id' => $actor->id,
         ]);
     }
 
@@ -79,10 +76,17 @@ class FileRepository
      */
     public function moveUploadedFileToTemp(UploadedFileInterface $upload)
     {
+        // 检查上传错误
         $this->handleUploadError($upload->getError());
+        // 判断文件是否超过上传大小限制
+        $size = $this->settings->get('maxsize', FileRepository::DEFAULT_MAX_FILE_SIZE);
+        if (($upload->getSize() / 1024) > $size)
+            throw new Exception('Upload max filesize limit ' . $size);
+        //$this->validator->assertValid(compact('upload'));
 
         // Move the file to a temporary location first.
-        $tempFile = tempnam($this->path.'/tmp', 'irony.github.upload.');
+        // 移动到临时文件
+        $tempFile = tempnam($this->path . '/tmp', 'irony');
         $upload->moveTo($tempFile);
 
         $file = new Upload(
@@ -94,8 +98,6 @@ class FileRepository
             true
         );
 
-        $this->validator->assertValid(compact('file'));
-
         return $file;
     }
 
@@ -103,25 +105,25 @@ class FileRepository
     {
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
-                throw new InvalidUploadException('Upload max filesize limit reached from php.ini.');
+                throw new Exception('Upload max filesize limit reached from php.ini.');
                 break;
             case UPLOAD_ERR_FORM_SIZE:
-                throw new InvalidUploadException('Upload max filesize limit reached from form.');
+                throw new Exception('Upload max filesize limit reached from form.');
                 break;
             case UPLOAD_ERR_PARTIAL:
-                throw new InvalidUploadException('Partial upload.');
+                throw new Exception('Partial upload.');
                 break;
             case UPLOAD_ERR_NO_FILE:
-                throw new InvalidUploadException('No file uploaded.');
+                throw new Exception('No file uploaded.');
                 break;
             case UPLOAD_ERR_NO_TMP_DIR:
-                throw new InvalidUploadException('No tmp folder for uploading files.');
+                throw new Exception('No tmp folder for uploading files.');
                 break;
             case UPLOAD_ERR_CANT_WRITE:
-                throw new InvalidUploadException('Cannot write to disk');
+                throw new Exception('Cannot write to disk');
                 break;
             case UPLOAD_ERR_EXTENSION:
-                throw new InvalidUploadException('A php extension blocked the upload.');
+                throw new Exception('A php extension blocked the upload.');
                 break;
             case UPLOAD_ERR_OK:
                 break;
@@ -171,7 +173,7 @@ class FileRepository
     }
 
     /**
-     * @param Upload        $upload
+     * @param Upload $upload
      * @param UploadAdapter $adapter
      *
      * @return bool|false|resource|string
@@ -186,7 +188,7 @@ class FileRepository
     }
 
     /**
-     * @param File            $file
+     * @param File $file
      * @param DownloadCommand $command
      *
      * @return Download
@@ -196,10 +198,9 @@ class FileRepository
         $download = new Download();
 
         $download->forceFill([
-            'file_id'       => $file->id,
+            'file_id' => $file->id,
             'discussion_id' => $command->discussionId,
-            'post_id'       => $command->postId,
-            'downloaded_at' => new Carbon(),
+            'post_id' => $command->postId,
         ]);
 
         if ($command->actor && !$command->actor->isGuest()) {

@@ -9,8 +9,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 
 return [
     (new Extend\Routes('api'))
-        ->post('/irony/github/upload', 'irony.github.upload', Api\Controllers\UploadController::class)
-        ->post('/irony/github/watermark', 'irony.github.watermark', Api\Controllers\WatermarkUploadController::class),
+        ->post('/irony/github/upload', 'irony.github.upload', Api\Controllers\UploadController::class),
 
     (new Extend\Frontend('admin'))
         ->js(__DIR__ . '/js/dist/admin.js'),

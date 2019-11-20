@@ -2,8 +2,8 @@
 
 namespace Irony\Github\Upload\Api\Controllers;
 
+use Exception;
 use Irony\Github\Upload\Commands\Upload;
-use Irony\Github\Upload\Exceptions\InvalidUploadException;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -17,25 +17,27 @@ class UploadController implements RequestHandlerInterface
     /**
      * @var Dispatcher
      */
-    protected $bus;
+    protected $dispatcher;
 
-    public function __construct(Dispatcher $bus)
+    public function __construct(Dispatcher $dispatcher)
     {
-        $this->bus = $bus;
+        $this->dispatcher = $dispatcher;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $actor = $request->getAttribute('actor');
+        // 获取上传的文件
         $files = collect(Arr::get($request->getUploadedFiles(), 'files', []));
 
         /** @var Collection $collection */
-        $collection = $this->bus->dispatch(
+        $collection = $this->dispatcher->dispatch(
             new Upload($files, $actor)
         );
+        print_r($collection);
 
         if ($collection->isEmpty()) {
-            throw new InvalidUploadException('No files were uploaded');
+            throw new Exception('No files were uploaded');
         }
 
         return new JsonResponse($collection->toArray(), 201);
