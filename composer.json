@@ -17,7 +17,8 @@
         }
     ],
     "require": {
-        "flarum/core": "^0.1.0-beta.8"
+        "flarum/core": "^0.1.0-beta.8",
+        "milo/github-api": "^1.4.6"
     },
     "support": {
         "issues": "https://github.com/892768447/flarum-ext-github-upload/issues",
@@ -27,7 +28,7 @@
         "flarum-extension": {
             "title": "Upload File To Github",
             "icon": {
-                "image": "fas fa-cloud-upload-alt",
+                "name": "fas fa-cloud-upload-alt",
                 "backgroundColor": "#000",
                 "color": "#fff"
             }

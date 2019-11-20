@@ -7,6 +7,8 @@ use Flarum\Foundation\AbstractValidator;
 
 class UploadValidator extends AbstractValidator
 {
+    const DEFAULT_MAX_FILE_SIZE = 1024;
+
     protected function getRules()
     {
         /** @var Settings $settings */
@@ -15,7 +17,7 @@ class UploadValidator extends AbstractValidator
         return [
             'file' => [
                 'required',
-                'max:'.$settings->get('maxsize', Settings::DEFAULT_MAX_FILE_SIZE),
+                'max:'.$settings->get('maxsize', UploadValidator::DEFAULT_MAX_FILE_SIZE),
             ],
         ];
     }

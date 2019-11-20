@@ -4,22 +4,13 @@ namespace Irony\Github\Upload\Listeners;
 
 use Irony\Github\Upload\Events\File\WillBeUploaded;
 use Irony\Github\Upload\Processors\ImageProcessor;
-use Illuminate\Contracts\Events\Dispatcher;
 
 class ProcessesImages
 {
     /**
-     * @param Dispatcher $events
-     */
-    public function subscribe(Dispatcher $events)
-    {
-        $events->listen(WillBeUploaded::class, [$this, 'processor']);
-    }
-
-    /**
      * @param WillBeUploaded $event
      */
-    public function processor(WillBeUploaded $event)
+    public function handle(WillBeUploaded $event)
     {
         if ($this->validateMime($event->file->type)) {
             app(ImageProcessor::class)->process($event->file, $event->uploadedFile);
@@ -28,7 +19,6 @@ class ProcessesImages
 
     /**
      * @param $mime
-     *
      * @return bool
      */
     protected function validateMime($mime)
@@ -36,7 +26,6 @@ class ProcessesImages
         if ($mime == 'image/jpeg' || $mime == 'image/png' || $mime == 'image/gif' || $mime == 'image/svg+xml') {
             return true;
         }
-
         return false;
     }
 }

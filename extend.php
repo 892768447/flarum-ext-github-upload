@@ -3,7 +3,8 @@
 namespace Irony\Github\Upload;
 
 use Flarum\Extend;
-use Flarum\Foundation\Application;
+use Flarum\Api\Event\Serializing;
+use Irony\Github\Upload\Events\File\WillBeUploaded;
 use Illuminate\Contracts\Events\Dispatcher;
 
 return [
@@ -20,8 +21,8 @@ return [
 
     new Extend\Locales(__DIR__ . '/resources/locale'),
 
-    function (Dispatcher $events, Application $app) {
-        $events->subscribe(Listeners\AddUploadsApi::class);
-        $events->subscribe(Listeners\ProcessesImages::class);
+    function (Dispatcher $events) {
+        $events->listen(Serializing::class, Listeners\AddUploadsApi::class);
+        $events->listen(WillBeUploaded::class,Listeners\ProcessesImages::class);
     },
 ];

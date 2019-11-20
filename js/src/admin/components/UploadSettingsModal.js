@@ -1,4 +1,5 @@
 import SettingsModal from "flarum/components/SettingsModal";
+import Switch from "flarum/components/Switch";
 
 export default class UploadSettingsModal extends SettingsModal {
     className() {
@@ -51,14 +52,14 @@ export default class UploadSettingsModal extends SettingsModal {
             <div className="Form-group">
                 <label>
                     {app.translator.trans(
-                        "flarum-ext-github-upload.admin.settings.watermark_label"
+                        "flarum-ext-github-upload.admin.settings.watermark_label1"
                     )}
                 </label>
-                <input
-                    type="checkbox"
-                    className="FormControl"
-                    bidi={this.setting("irony.github.upload.watermark")}
-                />
+                {Switch.component({
+                    state: !!Number(this.setting("irony.github.upload.watermark")()),
+                    children: app.translator.trans("flarum-ext-github-upload.admin.settings.watermark_label2"),
+                    onchange: this.setting("irony.github.upload.watermark")
+                })}
             </div>
         ];
     }

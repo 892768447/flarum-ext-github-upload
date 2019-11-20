@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageProcessor implements Processable
 {
+    const DEFAULT_MAX_IMAGE_WIDTH = 960;
+
     /**
      * @var Settings
      */
@@ -36,13 +38,11 @@ class ImageProcessor implements Processable
         if ($mimeType == 'image/jpeg' || $mimeType == 'image/png') {
             $image = (new ImageManager())->make($upload->getRealPath());
 
-            if ($this->settings->get('mustResize')) {
-                $this->resize($image);
-            }
+            // 调整图片大小
+            $this->resize($image);
 
-            if ($this->settings->get('addsWatermarks')) {
-                $this->watermark($image);
-            }
+            // 添加水印
+            $this->watermark($image);
 
             @file_put_contents(
                 $upload->getRealPath(),
@@ -57,7 +57,7 @@ class ImageProcessor implements Processable
     protected function resize(Image $manager)
     {
         $manager->resize(
-            $this->settings->get('resizeMaxWidth', Settings::DEFAULT_MAX_IMAGE_WIDTH),
+            ImageProcessor::DEFAULT_MAX_IMAGE_WIDTH,
             null,
             function ($constraint) {
                 $constraint->aspectRatio();
@@ -70,11 +70,10 @@ class ImageProcessor implements Processable
      */
     protected function watermark(Image $image)
     {
-        if ($this->settings->get('watermark')) {
-            $image->insert(
-                storage_path($this->settings->get('watermark')),
-                $this->settings->get('watermarkPosition', 'bottom-right')
-            );
+        if ($this->settings->get('irony.github.upload.watermark')) {
+            // 添加网站地址
+            // $image->insert(
+            // );
         }
     }
 }

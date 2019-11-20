@@ -12,4 +12,5 @@ flarum-ext-github-upload:
       token_label: Github Token
       projects_label: Github Projects (split with ,)
       maxsize_label: Maximum file size (in kilobytes)
-      watermark_label: With Watermark
+      watermark_label1: Image Watermark
+      watermark_label2: On or Off?
