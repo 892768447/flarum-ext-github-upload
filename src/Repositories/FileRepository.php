@@ -59,9 +59,9 @@ class FileRepository
         // unique file md5
         // 比对文件md5值
         $md5 = md5_file($file->getPathname());
-        $efile = $this->findByMd5($md5);
-        if ($efile)
-            return $efile;
+        $file = $this->findByMd5($md5);
+        if ($file)
+            return $file;
 
         return (new File())->forceFill([
             'md5' => $md5,
@@ -73,22 +73,19 @@ class FileRepository
      * @param UploadedFileInterface $upload
      *
      * @return Upload
+     * @throws Exception
      */
     public function moveUploadedFileToTemp(UploadedFileInterface $upload)
     {
         // 检查上传错误
         $this->handleUploadError($upload->getError());
-        // 判断文件是否超过上传大小限制
-        $size = $this->settings->get('maxsize', FileRepository::DEFAULT_MAX_FILE_SIZE);
-        if (($upload->getSize() / 1024) > $size)
-            throw new Exception('Upload max filesize limit ' . $size);
-        //$this->validator->assertValid(compact('upload'));
 
         // Move the file to a temporary location first.
         // 移动到临时文件
         $tempFile = tempnam($this->path . '/tmp', 'irony');
         $upload->moveTo($tempFile);
 
+        // 构造新实例
         $file = new Upload(
             $tempFile,
             $upload->getClientFilename(),
@@ -97,6 +94,14 @@ class FileRepository
             $upload->getError(),
             true
         );
+
+        // 判断文件是否超过上传大小限制
+        $size = $this->settings->get('maxsize', FileRepository::DEFAULT_MAX_FILE_SIZE);
+        if (($file->getSize() / 1024) > $size) {
+            // 删除临时文件
+            unlink($tempFile);
+            $this->handleUploadError(UPLOAD_ERR_FORM_SIZE);
+        }
 
         return $file;
     }
