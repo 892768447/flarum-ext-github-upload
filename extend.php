@@ -4,7 +4,6 @@ namespace Irony\Github\Upload;
 
 use Flarum\Extend;
 use Flarum\Api\Event\Serializing;
-use Irony\Github\Upload\Events\File\WillBeUploaded;
 use Illuminate\Contracts\Events\Dispatcher;
 
 return [
@@ -22,6 +21,5 @@ return [
 
     function (Dispatcher $events) {
         $events->listen(Serializing::class, Listeners\AddUploadsApi::class);
-        $events->listen(WillBeUploaded::class,Listeners\ProcessesImages::class);
     },
 ];

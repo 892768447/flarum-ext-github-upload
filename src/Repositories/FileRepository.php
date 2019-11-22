@@ -3,14 +3,13 @@
 namespace Irony\Github\Upload\Repositories;
 
 use Exception;
-use Irony\Github\Upload\Commands\Download as DownloadCommand;
 use Irony\Github\Upload\Contracts\UploadAdapter;
-use Irony\Github\Upload\Download;
 use Irony\Github\Upload\File;
 use Flarum\Foundation\Application;
 use Flarum\User\User;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Str;
+use Irony\Github\Upload\Processors\ImageProcessor;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
@@ -37,6 +36,7 @@ class FileRepository
     }
 
     /**
+     * 通过md5找到已存在的文件记录
      * @param $md5
      *
      * @return File
@@ -59,9 +59,8 @@ class FileRepository
         // unique file md5
         // 比对文件md5值
         $md5 = md5_file($file->getPathname());
-        $file = $this->findByMd5($md5);
-        if ($file)
-            return $file;
+
+        // 上传文件到Github
 
         return (new File())->forceFill([
             'md5' => $md5,
@@ -70,6 +69,22 @@ class FileRepository
     }
 
     /**
+     * 获取已经存在的文件
+     * @param Upload $file
+     * @return File|Upload|null
+     */
+    public function  getExistsFile(Upload $file)
+    {
+        // 比对文件md5值
+        $md5 = md5_file($file->getPathname());
+        $file = $this->findByMd5($md5);
+        if ($file)
+            return $file;
+        return $md5;
+    }
+
+    /**
+     * 移动上传的文件到临时目录并判断类型和大小
      * @param UploadedFileInterface $upload
      *
      * @return Upload
@@ -141,6 +156,7 @@ class FileRepository
      * @param Upload $file
      *
      * @return bool
+     * @throws \League\Flysystem\FileNotFoundException
      */
     public function removeFromTemp(Upload $file)
     {
@@ -182,6 +198,7 @@ class FileRepository
      * @param UploadAdapter $adapter
      *
      * @return bool|false|resource|string
+     * @throws \League\Flysystem\FileNotFoundException
      */
     public function readUpload(Upload $upload, UploadAdapter $adapter)
     {
@@ -190,30 +207,5 @@ class FileRepository
         return $adapter->supportsStreams()
             ? $filesystem->readStream($upload->getBasename())
             : $filesystem->read($upload->getBasename());
-    }
-
-    /**
-     * @param File $file
-     * @param DownloadCommand $command
-     *
-     * @return Download
-     */
-    public function downloadedEntry(File $file, DownloadCommand $command)
-    {
-        $download = new Download();
-
-        $download->forceFill([
-            'file_id' => $file->id,
-            'discussion_id' => $command->discussionId,
-            'post_id' => $command->postId,
-        ]);
-
-        if ($command->actor && !$command->actor->isGuest()) {
-            $download->actor_id = $command->actor->id;
-        }
-
-        $download->save();
-
-        return $download;
     }
 }

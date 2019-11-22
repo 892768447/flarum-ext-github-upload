@@ -45,6 +45,7 @@ class UploadHandler
      * @param Upload $command
      *
      * @return Collection
+     * @throws \Flarum\User\Exception\PermissionDeniedException
      */
     public function handle(Upload $command)
     {
@@ -55,50 +56,28 @@ class UploadHandler
 
         $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
             try {
-                $upload = $this->files->moveUploadedFileToTemp($file);
-                print_r($upload);
-
 //                print_r($upload->getClientMimeType());
 
-//                $this->events->fire(
-//                    new Events\Adapter\Identified($command->actor, $upload, $adapter)
-//                );
-//
-//                $file = $this->files->createFileFromUpload($upload, $command->actor);
-//
-//                $this->events->fire(
-//                    new Events\File\WillBeUploaded($command->actor, $file, $upload)
-//                );
-//
-//                $response = $adapter->upload(
-//                    $file,
-//                    $upload,
-//                    $this->files->readUpload($upload, $adapter)
-//                );
-//
-//                $this->files->removeFromTemp($upload);
-//
-//                if (!($response instanceof File)) {
-//                    return false;
-//                }
-//
-//                $file = $response;
-//
-//                $file->upload_method = $adapter;
-//                $file->tag = $template;
+                // 移动文件到临时目录
+                $upload = $this->files->moveUploadedFileToTemp($file);
+                // 获取已经存在的文件
+                $fileormd5 = $this->files->getExistsFile($upload);
+                if ($fileormd5 instanceof File)
+                    return $fileormd5->url;
+                // 记录md5
+                $upload->md5 = $fileormd5;
+                // 添加文件水印
+                // 发出将要上传的事件
+                $this->events->fire(
+                    new Events\File\WillBeUploaded($command->actor, $file, $upload)
+                );
+                // 开始上传文件,并删除临时文件
+                $file = $this->files->createFileFromUpload($upload, $command->actor);
+                // 失败 return false;
+                // 存如数据库记录
 //                $file->actor_id = $command->actor->id;
-//
-//                $this->events->fire(
-//                    new Events\File\WillBeSaved($command->actor, $file, $upload)
-//                );
-//
-//                if ($file->isDirty() || !$file->exists) {
-//                    $file->save();
-//                }
-//
-//                $this->events->fire(
-//                    new Events\File\WasSaved($command->actor, $file, $upload)
-//                );
+//                $file->save();
+
             } catch (Exception $e) {
                 if (isset($upload)) {
                     $this->files->removeFromTemp($upload);

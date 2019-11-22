@@ -24,8 +24,8 @@ abstract class Event
     public $uploadedFile;
 
     /**
-     * @param User         $actor
-     * @param File         $file
+     * @param User $actor
+     * @param File $file
      * @param UploadedFile $uploadedFile
      */
     public function __construct(User $actor, File $file, UploadedFile $uploadedFile)
