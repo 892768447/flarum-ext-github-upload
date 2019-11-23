@@ -72,14 +72,14 @@ class UploadHandler
                     new Events\File\WillBeUploaded($command->actor, $file, $upload)
                 );
                 // 开始上传文件,并删除临时文件
-                $file = $this->files->createFileFromUpload($upload, $command->actor);
+                $upload = $this->files->createFileFromUpload($upload, $command->actor);
                 // 失败 return false;
-                // 存如数据库记录
-//                $file->actor_id = $command->actor->id;
-//                $file->save();
+                // 存入数据库记录
+                $upload->save();
 
             } catch (Exception $e) {
                 if (isset($upload)) {
+                    // 失败则删除临时文件
                     $this->files->removeFromTemp($upload);
                 }
 

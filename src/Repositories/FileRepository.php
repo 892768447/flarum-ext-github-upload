@@ -5,11 +5,11 @@ namespace Irony\Github\Upload\Repositories;
 use Exception;
 use Irony\Github\Upload\Contracts\UploadAdapter;
 use Irony\Github\Upload\File;
+use Milo\Github;
 use Flarum\Foundation\Application;
 use Flarum\User\User;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Str;
-use Irony\Github\Upload\Processors\ImageProcessor;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
@@ -29,10 +29,14 @@ class FileRepository
      */
     protected $settings;
 
+    protected $github;
+
     public function __construct(Application $app, SettingsRepositoryInterface $settings)
     {
         $this->path = $app->storagePath();
         $this->settings = $settings;
+        $github = new Github\Api;
+        $github->setToken($settings->get('irony.github.upload.token'));
     }
 
     /**
@@ -56,14 +60,18 @@ class FileRepository
      */
     public function createFileFromUpload(Upload $file, User $actor)
     {
-        // unique file md5
-        // 比对文件md5值
-        $md5 = md5_file($file->getPathname());
-
         // 上传文件到Github
-
+        $user = $this->settings->get('irony.github.upload.user');
+        // 随机取出一个项目
+        $project = array_rand(explode(',', $this->settings->get('irony.github.upload.$projects')));
+        $url = 'https://api.github.com/repos/' . $user . '/' . $project . '/contents/' . $file->md5 . $file->getExtension();
+        $data = [
+            'message' => 'user ' . $actor->id . ' upload file: ' . $file->getClientOriginalName(),
+            'content' => base64_encode(file_get_contents($file->getFilename()))
+        ];
+        $response = $this->github->decode($this->github->put($url, $data, [], ['Content-Type' => 'application/json']));
         return (new File())->forceFill([
-            'md5' => $md5,
+            'md5' => $file->md5,
             'actor_id' => $actor->id,
         ]);
     }
@@ -73,7 +81,7 @@ class FileRepository
      * @param Upload $file
      * @return File|Upload|null
      */
-    public function  getExistsFile(Upload $file)
+    public function getExistsFile(Upload $file)
     {
         // 比对文件md5值
         $md5 = md5_file($file->getPathname());
