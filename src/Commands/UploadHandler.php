@@ -66,11 +66,7 @@ class UploadHandler
                     return $fileormd5->url;
                 // 记录md5
                 $upload->md5 = $fileormd5;
-                // 添加文件水印
-                // 发出将要上传的事件
-                $this->events->fire(
-                    new Events\File\WillBeUploaded($command->actor, $file, $upload)
-                );
+                // 添加图片水印
                 // 开始上传文件,并删除临时文件
                 $upload = $this->files->createFileFromUpload($upload, $command->actor);
                 // 失败 return false;
@@ -94,17 +90,4 @@ class UploadHandler
         return $savedFiles->filter();
     }
 
-    /**
-     * @param $adapter
-     *
-     * @return UploadAdapter|null
-     */
-    protected function getAdapter($adapter)
-    {
-        if (!$adapter) {
-            return;
-        }
-
-        return app("irony.github.upload-adapter.$adapter");
-    }
 }

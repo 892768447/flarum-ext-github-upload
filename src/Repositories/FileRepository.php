@@ -63,8 +63,8 @@ class FileRepository
         // 上传文件到Github
         $user = $this->settings->get('irony.github.upload.user');
         // 随机取出一个项目
-        $project = array_rand(explode(',', $this->settings->get('irony.github.upload.$projects')));
-        $url = 'https://api.github.com/repos/' . $user . '/' . $project . '/contents/' . $file->md5 . $file->getExtension();
+        $project = array_rand(explode(',', $this->settings->get('irony.github.upload.projects')));
+        $url = 'https://api.github.com/repos/' . $user . '/' . $project . '/contents/' . date('Y-m-d') . '/' . $file->md5 . $file->getExtension();
         $data = [
             'message' => 'user ' . $actor->id . ' upload file: ' . $file->getClientOriginalName(),
             'content' => base64_encode(file_get_contents($file->getFilename()))
