@@ -14,6 +14,17 @@ export default class UploadSettingsModal extends SettingsModal {
         return [
             <div className="Form-group">
                 <label>
+                    {app.translator.trans("flarum-ext-github-upload.admin.settings.user_label")}
+                </label>
+                <input
+                    required
+                    className="FormControl"
+                    bidi={this.setting("irony.github.upload.user")}
+                />
+            </div>,
+
+            <div className="Form-group">
+                <label>
                     {app.translator.trans("flarum-ext-github-upload.admin.settings.token_label")}
                 </label>
                 <input

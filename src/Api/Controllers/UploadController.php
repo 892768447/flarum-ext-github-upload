@@ -34,7 +34,6 @@ class UploadController implements RequestHandlerInterface
         $collection = $this->dispatcher->dispatch(
             new Upload($files, $actor)
         );
-        print_r($collection);
 
         if ($collection->isEmpty()) {
             throw new Exception('No files were uploaded');

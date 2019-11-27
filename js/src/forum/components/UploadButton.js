@@ -117,13 +117,6 @@ export default class UploadButton extends Component {
         response.forEach((text) => {
           this.textAreaObj.insertAtCursor(text + '\n');
         })
-
-        // if we are not starting a new discussion, the variable is defined
-        if (typeof this.textAreaObj.props.preview !== 'undefined') {
-            // show what we just uploaded
-            this.textAreaObj.props.preview();
-        }
-
         // reset the button for a new upload
         setTimeout(() => {
             document.getElementById("irony-github-upload-form").reset();

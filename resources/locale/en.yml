@@ -9,6 +9,7 @@ flarum-ext-github-upload:
   admin:
     settings:
       title: Upload Settings
+      user_label: Username
       token_label: Github Token
       projects_label: Github Projects (split with ,)
       maxsize_label: Maximum file size (in kilobytes)

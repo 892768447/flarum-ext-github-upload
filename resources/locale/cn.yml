@@ -9,6 +9,7 @@ flarum-ext-github-upload:
   admin:
     settings:
       title: 文件上传设定
+      user_label: 用户名
       token_label: Github Token
       projects_label: Github 储存项目 (用,分开)
       maxsize_label: 最大文件大小 (单位为 KB)
