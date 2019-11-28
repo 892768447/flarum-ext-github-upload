@@ -13,7 +13,7 @@ app.initializers.add('irony-github-upload', app => {
     extend(TextEditor.prototype, 'controlItems', function (items) {
         // check whether the user can upload images. If not, returns.
         // 检查是否可以上传
-        if (!app.forum.attribute('canUpload')) return;
+        if (!app.forum.attribute('canUploadToGithub')) return;
 
         // create and add the button
         // 创建上传按钮
@@ -39,7 +39,7 @@ app.initializers.add('irony-github-upload', app => {
     extend(TextEditor.prototype, 'configTextarea', function () {
         // check whether the user can upload images. If not, returns.
         // 检查是否可以上传
-        if (!app.forum.attribute('canUpload')) return;
+        if (!app.forum.attribute('canUploadToGithub')) return;
 
         if (!drag) {
             // 拖拽支持

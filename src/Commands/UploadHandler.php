@@ -60,7 +60,7 @@ class UploadHandler
                 }
                 return '[](' . $upload->url . ')';
             } catch (Exception $e) {
-                throw $e;
+                //throw $e;
             }
             return false;
         });

@@ -73,13 +73,19 @@ class FileRepository
         $size = $this->settings->get('irony.github.upload.maxsize', FileRepository::DEFAULT_MAX_FILE_SIZE);
         if (($file->getSize() / 1024) > $size) {
             // 删除临时文件
-            $this->removeFromTemp($file);
+            unlink($file->getRealPath());
             $this->handleUploadError(UPLOAD_ERR_FORM_SIZE);
         }
 
+        // 文件后缀名
+        $ext = str_replace('jpeg', 'jpg', $file->guessExtension() ?: $file->getClientOriginalExtension());
+        $mime = $file->getClientMimeType();
+        $originalName = $file->getClientOriginalName();
         // 获取已经存在的文件
         // 比对文件sha值
         $fileData = file_get_contents($file->getRealPath());
+        // 删除临时文件
+        unlink($file->getRealPath());
         $sha = sha1('blob ' . strlen($fileData) . chr(0) . $fileData);
         $existFile = $this->findBySha($sha);
         if ($existFile)
@@ -91,20 +97,21 @@ class FileRepository
         // https://developer.github.com/v3/repos/contents/#create-or-update-a-file
         $user = $this->settings->get('irony.github.upload.user');
         // 随机取出一个项目
-        $project = array_rand(explode(',', $this->settings->get('irony.github.upload.projects')));
-        $url = 'https://api.github.com/repos/' . $user . '/' . $project . '/contents/' . date('Y-m-d') . '/' . $sha . '.' . $file->guessExtension() ?: $file->getClientOriginalExtension();
+        $projects = explode(',', $this->settings->get('irony.github.upload.projects'));
+        $project = $projects[array_rand($projects)];
+        $url = 'https://api.github.com/repos/' . $user . '/' . $project . '/contents/' . date('Y-m-d') . '/' . $sha . '.' . $ext;
         $data = [
-            'message' => 'user ' . $actor->id . ' upload file: ' . $file->getClientOriginalName(),
+            'message' => 'user ' . $actor->id . ' upload file: ' . $originalName,
             'content' => base64_encode($fileData)
         ];
+        unset($fileData);
 
         $github = new Github\Api;
         $token = new Github\OAuth\Token($this->settings->get('irony.github.upload.token'));
         $github->setToken($token);
 
         $response = $github->decode($github->put($url, $data, [], ['Content-Type' => 'application/json']));
-        if (!$response->content) {// 删除临时文件
-            $this->removeFromTemp($file);
+        if (!$response->content) {
             $this->handleUploadError(UPLOAD_ERR_CANT_WRITE);
         }
 
@@ -112,10 +119,12 @@ class FileRepository
             'actor_id' => $actor->id,
             'url' => $response->content->download_url,
             'sha' => $response->content->sha,
-            'type' => $this->getFileType($file->getClientMimeType())
+            'type' => $this->getFileType($mime)
         ]);
         // 存入数据库记录
-        $file->save();
+        if (!$file->save()) {
+            $this->handleUploadError(UPLOAD_ERR_CANT_WRITE);
+        };
         return $file;
     }
 
@@ -157,28 +166,4 @@ class FileRepository
         }
     }
 
-    /**
-     * Deletes a file from the temporary file location.
-     *
-     * @param Upload $file
-     *
-     * @return bool
-     * @throws FileNotFoundException
-     */
-    public function removeFromTemp(Upload $file)
-    {
-        return $this->getTempFilesystem($file->getPath())->delete($file->getBasename());
-    }
-
-    /**
-     * Retrieves a filesystem manager for the temporary file location.
-     *
-     * @param string $path
-     *
-     * @return Filesystem
-     */
-    protected function getTempFilesystem($path)
-    {
-        return new Filesystem(new Local($path));
-    }
 }

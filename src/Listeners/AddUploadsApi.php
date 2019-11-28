@@ -14,7 +14,7 @@ class AddUploadsApi
     {
         if ($event->isSerializer(ForumSerializer::class)) {
             // 添加可上传属性
-            $event->attributes['canUpload'] = $event->actor->can('irony.github.upload');
+            $event->attributes['canUploadToGithub'] = $event->actor->can('irony.github.upload');
         }
     }
 }
