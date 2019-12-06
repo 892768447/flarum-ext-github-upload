@@ -58,7 +58,7 @@ class UploadHandler
                 if ($upload->type == 'image') {
                     return '![](' . $upload->url . ')';
                 }
-                return '[](' . $upload->url . ')';
+                return '[' . $upload->url . '](' . $upload->url . ')';
             } catch (Exception $e) {
                 //throw $e;
             }
