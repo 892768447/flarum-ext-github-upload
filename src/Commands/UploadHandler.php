@@ -4,7 +4,6 @@ namespace Irony\Github\Upload\Commands;
 
 use Exception;
 use Flagrow\Upload\Templates\AbstractTemplate;
-use Flarum\User\Exception\PermissionDeniedException;
 use Illuminate\Support\Collection;
 use Irony\Github\Upload\Contracts\UploadAdapter;
 use Irony\Github\Upload\Events;
@@ -43,14 +42,9 @@ class UploadHandler
      * @param Upload $command
      *
      * @return Collection
-     * @throws PermissionDeniedException
      */
     public function handle(Upload $command)
     {
-        $this->assertCan(
-            $command->actor,
-            'irony.github.upload'
-        );
 
         $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
             try {
