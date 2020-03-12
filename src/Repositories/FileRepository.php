@@ -117,7 +117,7 @@ class FileRepository
 
         $file = (new File())->forceFill([
             'actor_id' => $actor->id,
-            'url' => $response->content->download_url,
+            'url' => str_replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/', str_replace('/master/', '/', $response->content->download_url)),
             'sha' => $response->content->sha,
             'type' => $this->getFileType($mime)
         ]);
