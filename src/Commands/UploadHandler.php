@@ -50,7 +50,10 @@ class UploadHandler
             try {
                 $upload = $this->files->uploadToGithub($file, $command->actor);
                 if ($upload->type == 'image') {
-                    return '![](' . $upload->url . ')';
+                    return '[IMG]' . $upload->url . '[/IMG]';
+                }
+                if ($upload->type == 'video') {
+                    return '[GITHUB-VIDEO]' . $upload->url . '[/GITHUB-VIDEO]';
                 }
                 return '[' . $upload->url . '](' . $upload->url . ')';
             } catch (Exception $e) {

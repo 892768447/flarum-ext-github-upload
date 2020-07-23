@@ -133,6 +133,9 @@ class FileRepository
         if ($mime == 'image/jpeg' || $mime == 'image/png' || $mime == 'image/gif' || $mime == 'image/svg+xml') {
             return 'image';
         }
+        if ($mime == 'video/mp4' || $mime == 'video/x-flv' || $mime == 'video/x-msvideo'|| $mime =='video/quicktime'){
+            return 'video';
+        }
         return 'file';
     }
 
