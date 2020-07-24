@@ -1,6 +1,6 @@
 # Github Upload by Irony
 
-An extension that upload file to github
+An extension that upload file to github, which supports auto embedding images and videos
 
 ### Installation
 
