@@ -15,3 +15,5 @@ flarum-ext-github-upload:
       maxsize_label: Maximum file size (in kilobytes)
       watermark_label1: Image Watermark
       watermark_label2: On or Off?
+      cdn_label1: Use Jsdelivr CDN
+      cdn_label2: On or Off?

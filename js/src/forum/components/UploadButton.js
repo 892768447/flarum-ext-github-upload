@@ -2,7 +2,6 @@ import app from 'flarum/app';
 import Component from "flarum/Component";
 import icon from "flarum/helpers/icon";
 import Alert from "flarum/components/Alert";
-import LoadingIndicator from "flarum/components/LoadingIndicator";
 
 export default class UploadButton extends Component {
 
@@ -12,9 +11,6 @@ export default class UploadButton extends Component {
     init() {
         // the service type handling uploads
         this.textAreaObj = null;
-
-        // initial state of the button
-        this.loading = false;
     }
 
     /**
@@ -25,8 +21,8 @@ export default class UploadButton extends Component {
      */
     view() {
         return m('div', {className: 'Button hasIcon irony-github-upload-button Button--icon'}, [
-            this.loading ? LoadingIndicator.component({className: 'Button-icon'}) : icon('far fa-file', {className: 'Button-icon'}),
-            m('span', {className: 'Button-label'}, this.loading ? app.translator.trans('flarum-ext-github-upload.forum.states.loading') : app.translator.trans('flarum-ext-github-upload.forum.buttons.attach')),
+            icon('far fa-file', {className: 'Button-icon file-icon'}),
+            m('span', {className: 'Button-label'}, app.translator.trans('flarum-ext-github-upload.forum.buttons.attach')),
             m('form#irony-github-upload-form', [
                 m('input', {
                     type: 'file',
@@ -48,9 +44,9 @@ export default class UploadButton extends Component {
 
         var files = $(e.target)[0].files;
 
-        // set the button in the loading state (and redraw the element!)
-        this.loading = true;
-        m.redraw();
+        // 添加loading图标
+        $('.file-icon').removeClass('far fa-file');
+        $('.file-icon').addClass('fas fa-spinner fa-spin');
 
         this.uploadFiles(files, this.success, this.failure);
     }
@@ -91,7 +87,7 @@ export default class UploadButton extends Component {
             }))
         );
         // 5秒后自动关闭
-        setTimeout(function() {
+        setTimeout(function () {
             app.alerts.dismiss(alert);
         }, 3000);
     }
@@ -103,7 +99,9 @@ export default class UploadButton extends Component {
      * @param message
      */
     failure(message) {
-        // todo show popup
+        // 删除loading图标
+        $('.file-icon').removeClass('fas fa-spinner fa-spin');
+        $('.file-icon').addClass('far fa-file');
         this.alertNotice("error", message);
     }
 
@@ -114,13 +112,15 @@ export default class UploadButton extends Component {
      * @param response
      */
     success(response) {
+        // 删除loading图标
+        $('.file-icon').removeClass('fas fa-spinner fa-spin');
+        $('.file-icon').addClass('far fa-file');
         response.forEach((text) => {
-          this.textAreaObj.insertAtCursor(text + '\n');
+            this.textAreaObj.insertAtCursor(text + '\n');
         })
         // reset the button for a new upload
         setTimeout(() => {
             document.getElementById("irony-github-upload-form").reset();
-            this.loading = false;
         }, 1000);
     }
 }

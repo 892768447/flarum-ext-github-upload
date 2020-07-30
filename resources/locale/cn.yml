@@ -15,3 +15,5 @@ flarum-ext-github-upload:
       maxsize_label: 最大文件大小 (单位为 KB)
       watermark_label1: 图片水印
       watermark_label2: 是否开启？
+      cdn_label1: 使用 jsdelivr 加速
+      cdn_label2: 是否开启？

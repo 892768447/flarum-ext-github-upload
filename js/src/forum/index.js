@@ -23,17 +23,17 @@ app.initializers.add('irony-github-upload', app => {
 
         // animate the button on hover: shows the label
         // 鼠标悬停动画
-        $('.Button-label', '.item-irony-github-upload > div').hide();
-        $('.item-irony-github-upload > div').hover(
-            function () {
-                $('.Button-label', this).show();
-                $(this).removeClass('Button--icon')
-            },
-            function () {
-                $('.Button-label', this).hide();
-                $(this).addClass('Button--icon')
-            }
-        );
+        // $('.Button-label', '.item-irony-github-upload > div').hide();
+        // $('.item-irony-github-upload > div').hover(
+        //     function () {
+        //         $('.Button-label', this).show();
+        //         $(this).removeClass('Button--icon')
+        //     },
+        //     function () {
+        //         $('.Button-label', this).hide();
+        //         $(this).addClass('Button--icon')
+        //     }
+        // );
     });
 
     extend(TextEditor.prototype, 'configTextarea', function () {
