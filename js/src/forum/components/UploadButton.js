@@ -21,7 +21,7 @@ export default class UploadButton extends Component {
      */
     view() {
         return m('div', {className: 'Button hasIcon irony-github-upload-button Button--icon'}, [
-            icon('far fa-file', {className: 'Button-icon file-icon'}),
+            icon('fas fa-cloud-upload-alt', {className: 'Button-icon file-icon'}),
             m('span', {className: 'Button-label'}, app.translator.trans('flarum-ext-github-upload.forum.buttons.attach')),
             m('form#irony-github-upload-form', [
                 m('input', {
@@ -45,7 +45,7 @@ export default class UploadButton extends Component {
         var files = $(e.target)[0].files;
 
         // 添加loading图标
-        $('.file-icon').removeClass('far fa-file');
+        $('.file-icon').removeClass('fas fa-cloud-upload-alt');
         $('.file-icon').addClass('fas fa-spinner fa-spin');
 
         this.uploadFiles(files, this.success, this.failure);
@@ -101,7 +101,7 @@ export default class UploadButton extends Component {
     failure(message) {
         // 删除loading图标
         $('.file-icon').removeClass('fas fa-spinner fa-spin');
-        $('.file-icon').addClass('far fa-file');
+        $('.file-icon').addClass('fas fa-cloud-upload-alt');
         this.alertNotice("error", message);
     }
 
@@ -114,7 +114,7 @@ export default class UploadButton extends Component {
     success(response) {
         // 删除loading图标
         $('.file-icon').removeClass('fas fa-spinner fa-spin');
-        $('.file-icon').addClass('far fa-file');
+        $('.file-icon').addClass('fas fa-cloud-upload-alt');
         response.forEach((text) => {
             this.textAreaObj.insertAtCursor(text + '\n');
         })
