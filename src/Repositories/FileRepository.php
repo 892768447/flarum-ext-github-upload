@@ -115,9 +115,12 @@ class FileRepository
             $this->handleUploadError(UPLOAD_ERR_CANT_WRITE);
         }
 
+        $url = $response->content->download_url;
+        if (((string)$this->settings->get('irony.github.upload.jsdelivrcdn')) == '1')
+            $url = str_replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/', str_replace('/master/', '/', $url));
         $file = (new File())->forceFill([
             'actor_id' => $actor->id,
-            'url' => str_replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/', str_replace('/master/', '/', $response->content->download_url)),
+            'url' => $url,
             'sha' => $response->content->sha,
             'type' => $this->getFileType($mime)
         ]);

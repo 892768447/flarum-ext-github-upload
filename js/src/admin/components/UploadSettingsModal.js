@@ -63,13 +63,13 @@ export default class UploadSettingsModal extends SettingsModal {
             <div className="Form-group">
                 <label>
                     {app.translator.trans(
-                        "flarum-ext-github-upload.admin.settings.watermark_label1"
+                        "flarum-ext-github-upload.admin.settings.cdn_label1"
                     )}
                 </label>
                 {Switch.component({
-                    state: !!Number(this.setting("irony.github.upload.watermark")()),
-                    children: app.translator.trans("flarum-ext-github-upload.admin.settings.watermark_label2"),
-                    onchange: this.setting("irony.github.upload.watermark")
+                    state: !!Number(this.setting("irony.github.upload.jsdelivrcdn")()),
+                    children: app.translator.trans("flarum-ext-github-upload.admin.settings.cdn_label2"),
+                    onchange: this.setting("irony.github.upload.jsdelivrcdn")
                 })}
             </div>
         ];
