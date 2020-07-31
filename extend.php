@@ -5,6 +5,7 @@ namespace Irony\Github\Upload;
 use Flarum\Extend;
 use Flarum\Api\Event\Serializing;
 use Illuminate\Contracts\Events\Dispatcher;
+use s9e\TextFormatter\Configurator;
 
 return [
     (new Extend\Routes('api'))
@@ -22,4 +23,11 @@ return [
     function (Dispatcher $events) {
         $events->listen(Serializing::class, Listeners\AddUploadsApi::class);
     },
+    (new Extend\Formatter)
+        ->configure(function (Configurator $config) {
+            $config->BBCodes->addCustom(
+                '[GITHUB-VIDEO]{URL1}[/GITHUB-VIDEO]',
+                '<video class="githubVideo" controls><source src="{URL1}" type="video/mp4"></video>'
+            );
+        })
 ];
