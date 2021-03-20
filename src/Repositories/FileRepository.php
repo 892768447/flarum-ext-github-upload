@@ -117,7 +117,8 @@ class FileRepository
 
         $url = $response->content->download_url;
         if (((string)$this->settings->get('irony.github.upload.jsdelivrcdn')) == '1')
-            $url = str_replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/', str_replace('/master/', '/', $url));
+            $url = str_replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/',
+                str_replace('/main/', '@main/', str_replace('/master/', '@master/', $url)));
         $file = (new File())->forceFill([
             'actor_id' => $actor->id,
             'url' => $url,
@@ -136,7 +137,7 @@ class FileRepository
         if ($mime == 'image/jpeg' || $mime == 'image/png' || $mime == 'image/gif' || $mime == 'image/svg+xml') {
             return 'image';
         }
-        if ($mime == 'video/mp4' || $mime == 'video/x-flv' || $mime == 'video/x-msvideo'|| $mime =='video/quicktime'){
+        if ($mime == 'video/mp4' || $mime == 'video/x-flv' || $mime == 'video/x-msvideo' || $mime == 'video/quicktime') {
             return 'video';
         }
         return 'file';
