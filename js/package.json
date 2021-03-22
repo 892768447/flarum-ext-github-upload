@@ -2,15 +2,15 @@
   "private": true,
   "name": "@irony/github-upload",
   "dependencies": {
-    "flarum-webpack-config": "^0.1.0-beta.8"
+    "flarum-webpack-config": "^0.1.0-beta.10"
   },
   "scripts": {
     "build": "webpack --mode production",
     "watch": "webpack --mode development --watch"
   },
   "devDependencies": {
-    "flarum": "^1.0.2",
+    "flarum": "^0.1.0-beta.15",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^4.5.0"
   }
 }

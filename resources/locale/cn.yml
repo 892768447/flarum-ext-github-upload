@@ -17,3 +17,5 @@ flarum-ext-github-upload:
       watermark_label2: 是否开启？
       cdn_label1: 使用 jsdelivr 加速
       cdn_label2: 是否开启？
+      save_label: 保存
+      success_label: 保存成功

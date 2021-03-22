@@ -17,3 +17,5 @@ flarum-ext-github-upload:
       watermark_label2: On or Off?
       cdn_label1: Use Jsdelivr CDN
       cdn_label2: On or Off?
+      save_label: Save
+      success_label: Saved successfully
