@@ -17,9 +17,19 @@ app.initializers.add('irony-github-upload', app => {
 
         // create and add the button
         // 创建上传按钮
-        uploadButton = new UploadButton;
-        uploadButton.textAreaObj = this;
-        items.add('irony-github-upload', uploadButton, 0);
+        const versions = app.forum.attribute('version').split('.');
+        if (parseInt(versions[versions.length - 1]) >= 15) {
+            items.add(
+                'irony-github-upload',
+                UploadButton.component({
+                    textAreaObj: this,
+                })
+            );
+        } else {
+            uploadButton = new UploadButton;
+            uploadButton.textAreaObj = this;
+            items.add('irony-github-upload', uploadButton, 0);
+        }
 
         // animate the button on hover: shows the label
         // 鼠标悬停动画

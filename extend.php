@@ -4,6 +4,8 @@ namespace Irony\Github\Upload;
 
 use Flarum\Extend;
 use Flarum\Api\Event\Serializing;
+use Flarum\Api\Serializer\ForumSerializer;
+use Flarum\Api\Serializer\DiscussionSerializer;
 use Illuminate\Contracts\Events\Dispatcher;
 use s9e\TextFormatter\Configurator;
 
@@ -18,7 +20,20 @@ return [
         ->css(__DIR__ . '/resources/less/forum/forum.less')
         ->js(__DIR__ . '/js/dist/forum.js'),
 
+    (new Extend\ApiSerializer(ForumSerializer::class))
+        ->attribute('canUploadToGithub', function (ForumSerializer $serializer) {
+            return true;
+        }),
+
+    (new Extend\ApiSerializer(DiscussionSerializer::class))
+        ->attribute('canUploadToGithub', function (DiscussionSerializer $serializer, $model) {
+            return true;
+        }),
+
     new Extend\Locales(__DIR__ . '/resources/locale'),
+
+    (new Extend\Event())
+        ->listen(Serializing::class, Listeners\AddUploadsApi::class),
 
     function (Dispatcher $events) {
         $events->listen(Serializing::class, Listeners\AddUploadsApi::class);
