@@ -1,89 +1,98 @@
 import app from 'flarum/app';
-import Component from "flarum/Component";
-import Button from 'flarum/components/Button';
-import icon from "flarum/helpers/icon";
-import Alert from "flarum/components/Alert";
-import classList from 'flarum/utils/classList';
+import Component from 'flarum/common/Component';
+import Button from 'flarum/common/components/Button';
+import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
+import classList from 'flarum/common/utils/classList';
 
 export default class UploadButton extends Component {
-
     oninit(vnode) {
         super.oninit(vnode);
-        // the service type handling uploads
-        this.textAreaObj = this.attrs.textAreaObj;
-    }
 
-    /**
-     * Load the configured remote uploader service.
-     */
-    init() {
-        // the service type handling uploads
-        this.textAreaObj = null;
+        this.attrs.uploader.on('uploaded', () => {
+            // reset the button for a new upload
+            this.$('form')[0].reset();
+
+            // redraw to reflect uploader.loading in the DOM
+            m.redraw();
+        });
     }
 
     oncreate(vnode) {
         super.oncreate(vnode);
+
+        // Add tooltip
+        if (!this.isMediaUploadButton) {
+            this.$().tooltip();
+        }
     }
 
-    /**
-     * Show the actual Upload Button.
-     * 上传按钮
-     *
-     * @returns {*}
-     */
     view() {
-        const versions = app.forum.attribute('version').split('.');
-        if (parseInt(versions[versions.length - 1]) >= 15) {
-            return (
-                <Button
-                    className={classList([
-                        'Button',
-                        'hasIcon',
-                        'irony-github-upload-button',
-                        'Button--icon'
-                    ])}
-                    icon={'fas fa-file-upload'}
-                    onclick={this.uploadButtonClicked.bind(this)}
-                    disabled={this.attrs.disabled}
-                >
-                    <span
-                        className="Button-label">{app.translator.trans('flarum-ext-github-upload.forum.buttons.attach')}</span>}
-                    <form>
-                        <input type="file" multiple={true} onchange={this.process.bind(this)}/>
-                    </form>
-                </Button>
-            );
-        }
+        const buttonText = this.attrs.uploader.uploading
+            ? app.translator.trans('flarum-ext-github-upload.forum.states.loading')
+            : app.translator.trans('flarum-ext-github-upload.forum.buttons.attach');
 
-        return m('div', {className: 'Button hasIcon irony-github-upload-button Button--icon'}, [
-            icon('fas fa-cloud-upload-alt', {className: 'Button-icon file-icon'}),
-            m('span', {className: 'Button-label'}, app.translator.trans('flarum-ext-github-upload.forum.buttons.attach')),
-            m('form#irony-github-upload-form', [
-                m('input', {
-                    type: 'file',
-                    multiple: true,
-                    onchange: this.process.bind(this)
-                })
-            ])
-        ]);
+        /**
+         * Flarum core has decided that all buttons should have tooltips, but
+         * it uses `extractText` to get a title attr when none is provided.
+         *
+         * That returns `false` when no text is available, like the icon in a
+         * button.
+         *
+         * This means that it starts creating weird tooltips, such as `falsefalse`
+         * and `falseUpload`.
+         *
+         * To override this behaviour, we pass `" "` when no tooltip is desired.
+         * Using `""` won't work as JS interprets this as a falsey value which will
+         * trigger the core logic.
+         *
+         * Thankfully, browsers ignore title attributes made of only whitespace,
+         * preventing a ghost-like tooltip.
+         */
+        const tooltip = (!this.isMediaUploadButton && buttonText) || ' ';
+
+        return (
+            <Button
+                className={classList([
+                    'Button',
+                    'hasIcon',
+                    'irony-github-upload-button',
+                    !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--icon',
+                    !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--link',
+                    this.attrs.uploader.uploading && 'uploading',
+                ])}
+                icon={!this.attrs.uploader.uploading && 'fas fa-cloud-upload-alt'}
+                onclick={this.uploadButtonClicked.bind(this)}
+                title={tooltip}
+                disabled={this.attrs.disabled}
+            >
+                {this.attrs.uploader.uploading &&
+                <LoadingIndicator size="tiny" className="LoadingIndicator--inline Button-icon"/>}
+                {(this.isMediaUploadButton || this.attrs.uploader.uploading) &&
+                <span className="Button-label">{buttonText}</span>}
+                <form>
+                    <input type="file" multiple={true} onchange={this.process.bind(this)}/>
+                </form>
+            </Button>
+        );
     }
 
     /**
      * Process the upload event.
-     * 解析上传事件
      *
      * @param e
      */
     process(e) {
         // get the file from the input field
+        const files = this.$('input').prop('files');
 
-        var files = $(e.target)[0].files;
+        if (files.length === 0) {
+            // We've got no files to upload, so trying
+            // to begin an upload will show an error
+            // to the user.
+            return;
+        }
 
-        // 添加loading图标
-        $('.file-icon').removeClass('fas fa-cloud-upload-alt');
-        $('.file-icon').addClass('fas fa-spinner fa-spin');
-
-        this.uploadFiles(files, this.success, this.failure);
+        this.attrs.uploader.upload(files, !this.isMediaUploadButton);
     }
 
     /**
@@ -95,78 +104,5 @@ export default class UploadButton extends Component {
         // Trigger click on hidden input element
         // (Opens file dialog)
         this.$('input').click();
-    }
-
-    uploadFiles(files, successCallback, failureCallback) {
-        const data = new FormData;
-
-        for (var i = 0; i < files.length; i++) {
-            data.append('files[]', files[i]);
-        }
-
-        // send a POST request to the api
-        // 发送上传请求
-        return app.request({
-            method: 'POST',
-            url: app.forum.attribute('apiUrl') + '/irony/github/upload',
-            // prevent JSON.stringify'ing the form data in the XHR call
-            serialize: raw => raw,
-            data
-        }).then(
-            this.success.bind(this),
-            this.failure.bind(this)
-        );
-    }
-
-    /**
-     * 消息提示
-     *
-     * @param type
-     * @param message
-     */
-    alertNotice(type, message) {
-        let alert;
-        app.alerts.show(
-            (alert = new Alert({
-                type: type,
-                children: message
-            }))
-        );
-        // 3秒后自动关闭
-        setTimeout(function () {
-            app.alerts.dismiss(alert);
-        }, 3000);
-    }
-
-    /**
-     * Handles errors.
-     * 错误
-     *
-     * @param message
-     */
-    failure(message) {
-        // 删除loading图标
-        $('.file-icon').removeClass('fas fa-spinner fa-spin');
-        $('.file-icon').addClass('fas fa-cloud-upload-alt');
-        this.alertNotice("error", message);
-    }
-
-    /**
-     * Appends the file's link to the body of the composer.
-     * 上传成功添加链接到编辑器中
-     *
-     * @param response
-     */
-    success(response) {
-        // 删除loading图标
-        $('.file-icon').removeClass('fas fa-spinner fa-spin');
-        $('.file-icon').addClass('fas fa-cloud-upload-alt');
-        response.forEach((text) => {
-            this.textAreaObj.insertAtCursor(text + '\n');
-        });
-        // reset the button for a new upload
-        setTimeout(() => {
-            document.getElementById("irony-github-upload-form").reset();
-        }, 1000);
     }
 }

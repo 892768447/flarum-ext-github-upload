@@ -20,6 +20,9 @@ return [
         ->css(__DIR__ . '/resources/less/forum/forum.less')
         ->js(__DIR__ . '/js/dist/forum.js'),
 
+    new Extend\Locales(__DIR__ . '/resources/locale'),
+
+    // 添加属性
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->attribute('canUploadToGithub', function (ForumSerializer $serializer) {
             return true;
@@ -30,14 +33,6 @@ return [
             return true;
         }),
 
-    new Extend\Locales(__DIR__ . '/resources/locale'),
-
-    (new Extend\Event())
-        ->listen(Serializing::class, Listeners\AddUploadsApi::class),
-
-    function (Dispatcher $events) {
-        $events->listen(Serializing::class, Listeners\AddUploadsApi::class);
-    },
     (new Extend\Formatter)
         ->configure(function (Configurator $config) {
             $config->BBCodes->addCustom(

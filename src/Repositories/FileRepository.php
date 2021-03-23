@@ -3,15 +3,12 @@
 namespace Irony\Github\Upload\Repositories;
 
 use Exception;
+use Flarum\Foundation\Paths;
+use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\User;
 use Irony\Github\Upload\Contracts\UploadAdapter;
 use Irony\Github\Upload\File;
-use League\Flysystem\FileNotFoundException;
 use Milo\Github;
-use Flarum\Foundation\Application;
-use Flarum\User\User;
-use Flarum\Settings\SettingsRepositoryInterface;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 
@@ -29,9 +26,15 @@ class FileRepository
      */
     protected $settings;
 
-    public function __construct(Application $app, SettingsRepositoryInterface $settings)
+//    public function __construct(Application $app, SettingsRepositoryInterface $settings)
+//    {
+//        $this->path = $app->storagePath();
+//        $this->settings = $settings;
+//    }
+
+    public function __construct(Paths $paths, SettingsRepositoryInterface $settings)
     {
-        $this->path = $app->storagePath();
+        $this->path = $paths->storage;
         $this->settings = $settings;
     }
 
@@ -84,6 +87,8 @@ class FileRepository
         // 获取已经存在的文件
         // 比对文件sha值
         $fileData = file_get_contents($file->getRealPath());
+        // 文件时间
+        $fileDate = date('Y-m-d H:i:s', $file->getCTime());
         // 删除临时文件
         unlink($file->getRealPath());
         $sha = sha1('blob ' . strlen($fileData) . chr(0) . $fileData);
@@ -121,14 +126,16 @@ class FileRepository
                 str_replace('/main/', '@main/', str_replace('/master/', '@master/', $url)));
         $file = (new File())->forceFill([
             'actor_id' => $actor->id,
+            'name' => $originalName,
             'url' => $url,
             'sha' => $response->content->sha,
-            'type' => $this->getFileType($mime)
+            'type' => $this->getFileType($mime),
+            'created_at' => $fileDate,
         ]);
         // 存入数据库记录
         if (!$file->save()) {
             $this->handleUploadError(UPLOAD_ERR_CANT_WRITE);
-        };
+        }
         return $file;
     }
 

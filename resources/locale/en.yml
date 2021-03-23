@@ -3,8 +3,8 @@ flarum-ext-github-upload:
     buttons:
       attach: Attach
     states:
+      loading: Uploading
       error: Error
-      loading: Loading
       success: Success
   admin:
     settings:

@@ -3,7 +3,7 @@ flarum-ext-github-upload:
     buttons:
       attach: 添加附件
     states:
-      loading: 加载中
+      loading: 上传中
       success: 成功
       error: 错误
   admin:

@@ -3,35 +3,46 @@
 namespace Irony\Github\Upload\Api\Controllers;
 
 use Exception;
-use Irony\Github\Upload\Commands\Upload;
+use Flarum\Api\Controller\AbstractListController;
+use FoF\Upload\Exceptions\InvalidUploadException;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Psr\Http\Message\ResponseInterface;
+use Irony\Github\Upload\Api\Serializers\FileSerializer;
+use Irony\Github\Upload\Commands\Upload;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response\JsonResponse;
+use Tobscure\JsonApi\Document;
 
-class UploadController implements RequestHandlerInterface
+class UploadController extends AbstractListController
 {
+
+    public $serializer = FileSerializer::class;
+
     /**
      * @var Dispatcher
      */
-    protected $dispatcher;
+    protected $bus;
 
-    public function __construct(Dispatcher $dispatcher)
+    public function __construct(Dispatcher $bus)
     {
-        $this->dispatcher = $dispatcher;
+        $this->bus = $bus;
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    /**
+     * @param ServerRequestInterface $request
+     * @param Document $document
+     * @return Collection|mixed
+     * @throws Exception
+     */
+    protected function data(ServerRequestInterface $request, Document $document)
     {
         $actor = $request->getAttribute('actor');
         // 获取上传的文件
         $files = collect(Arr::get($request->getUploadedFiles(), 'files', []));
+//        print_r($files);
 
         /** @var Collection $collection */
-        $collection = $this->dispatcher->dispatch(
+        $collection = $this->bus->dispatch(
             new Upload($files, $actor)
         );
 
@@ -39,6 +50,7 @@ class UploadController implements RequestHandlerInterface
             throw new Exception('No files were uploaded');
         }
 
-        return new JsonResponse($collection->toArray(), 201);
+        return $collection;
     }
+
 }
