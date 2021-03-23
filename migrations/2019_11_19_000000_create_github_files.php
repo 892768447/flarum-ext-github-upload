@@ -5,6 +5,9 @@ use Illuminate\Database\Schema\Builder;
 
 return [
     'up' => function (Builder $schema) {
+        if ($schema->hasTable('irony_github_files')) {
+            return;
+        }
         $schema->create('irony_github_files', function (Blueprint $table) {
             $table->increments('id');                               // 自增ID
             $table->integer('actor_id')->unsigned()->nullable();    // 用户ID
@@ -17,6 +20,6 @@ return [
         });
     },
     'down' => function (Builder $schema) {
-        $schema->drop('irony_github_files');
+        $schema->dropIfExists('irony_github_files');
     },
 ];
