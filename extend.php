@@ -36,8 +36,12 @@ return [
     (new Extend\Formatter)
         ->configure(function (Configurator $config) {
             $config->BBCodes->addCustom(
-                '[GITHUB-VIDEO]{URL1}[/GITHUB-VIDEO]',
-                '<video class="githubVideo" controls><source src="{URL1}" type="video/mp4"></video>'
+                '[AUDIO]{URL1}[/AUDIO]',
+                '<audio controls="controls" src="{URL1}">Your browser does not support the audio tag.</audio>'
+            );
+            $config->BBCodes->addCustom(
+                '[VIDEO]{URL1}[/VIDEO]',
+                '<video controls="controls" src="{URL1}">Your browser does not support the video tag.</video>'
             );
         })
 ];

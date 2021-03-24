@@ -124,17 +124,33 @@ class FileRepository
         if (((string)$this->settings->get('irony.github.upload.jsdelivrcdn')) == '1')
             $url = str_replace('raw.githubusercontent.com/', 'cdn.jsdelivr.net/gh/',
                 str_replace('/main/', '@main/', str_replace('/master/', '@master/', $url)));
-        $file = (new File())->forceFill([
-            'actor_id' => $actor->id,
-            'name' => $originalName,
-            'url' => $url,
-            'sha' => $response->content->sha,
-            'type' => $this->getFileType($mime),
-            'created_at' => $fileDate,
-        ]);
-        // 存入数据库记录
-        if (!$file->save()) {
-            $this->handleUploadError(UPLOAD_ERR_CANT_WRITE);
+
+        try {
+            // new
+            $file = (new File())->forceFill([
+                'actor_id' => $actor->id,
+                'name' => $originalName,
+                'url' => $url,
+                'sha' => $response->content->sha,
+                'type' => $this->getFileType($mime),
+                'created_at' => $fileDate,
+            ]);
+            // 存入数据库记录
+            if (!$file->save()) {
+                $this->handleUploadError(UPLOAD_ERR_CANT_WRITE);
+            }
+        } catch (Exception $e) {
+            // old
+            $file = (new File())->forceFill([
+                'actor_id' => $actor->id,
+                'url' => $url,
+                'sha' => $response->content->sha,
+                'type' => $this->getFileType($mime),
+            ]);
+            // 存入数据库记录
+            if (!$file->save()) {
+                $this->handleUploadError(UPLOAD_ERR_CANT_WRITE);
+            }
         }
         return $file;
     }

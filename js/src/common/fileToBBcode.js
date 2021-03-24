@@ -9,11 +9,15 @@ export default function fileToBBcode(file) {
             return `[IMG]${file.url()}[/IMG]`;
 
         // video
+        case 'audio':
+            return `[AUDIO]${file.url()}[/AUDIO]`;
+
+        // video
         case 'video':
-            return `[GITHUB-VIDEO]${file.url()}[/GITHUB-VIDEO]`;
+            return `[VIDEO]${file.url()}[/VIDEO]`;
 
         // 'just-url' or unknown
         default:
-            return file.url();
+            return `[${file.name()}](${file.url()})`;
     }
 }
