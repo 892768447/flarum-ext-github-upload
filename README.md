@@ -2,6 +2,10 @@
 
 An extension that upload file to github, which supports auto embedding images and videos
 
+### Features
+- video and audio bbcode `[audio][/audio]` `[video][/video]`
+- keep local files
+
 ### Installation
 
 for beta 15 and latter
@@ -21,3 +25,5 @@ alter table irony_github_files add column path varchar(255) default null;
 ```
 
 thanks for [FriendsOfFlarum/upload](https://github.com/FriendsOfFlarum/upload)
+
+* It's best not to use it with a `fof/upload`
