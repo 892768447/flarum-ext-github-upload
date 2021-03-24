@@ -6,7 +6,7 @@ export default class File extends mixin(Model, {
     url: Model.attribute('url'),
     uuid: Model.attribute('sha'),
     type: Model.attribute('type'),
-    createdAt: Model.attribute('createdAt'),
+    created_at: Model.attribute('created_at'),
     path: Model.attribute('path'),
 }) {
     /**

@@ -22,7 +22,7 @@ class FileSerializer extends AbstractSerializer
             'url' => $model->url,
             'sha' => $model->sha,
             'type' => $model->type,
-            'createdAt' => $model->created_at,
+            'created_at' => $model->created_at,
             'name' => $model->name,
             'path' => $model->path,
         ];
