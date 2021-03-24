@@ -5,7 +5,7 @@ An extension that upload file to github, which supports auto embedding images an
 ### Installation
 
 ```sh
-composer require irony/flarum-ext-github-upload:dev-master
+composer require irony/flarum-ext-github-upload
 ```
 
 thanks for [FriendsOfFlarum/upload](https://github.com/FriendsOfFlarum/upload)
