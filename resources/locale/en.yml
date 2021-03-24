@@ -19,3 +19,4 @@ flarum-ext-github-upload:
       cdn_label2: On or Off?
       save_label: Save
       success_label: Saved successfully
+      keep_label: Keep Local Files

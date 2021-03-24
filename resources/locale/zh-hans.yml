@@ -19,3 +19,4 @@ flarum-ext-github-upload:
       cdn_label2: 是否开启？
       save_label: 保存
       success_label: 保存成功
+      keep_label: 保留本地文件

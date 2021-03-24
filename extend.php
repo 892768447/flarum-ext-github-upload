@@ -14,10 +14,11 @@ return [
         ->post('/irony/github/upload', 'irony.github.upload', Api\Controllers\UploadController::class),
 
     (new Extend\Frontend('admin'))
+        ->css(__DIR__ . '/resources/less/admin.less')
         ->js(__DIR__ . '/js/dist/admin.js'),
 
     (new Extend\Frontend('forum'))
-        ->css(__DIR__ . '/resources/less/forum/forum.less')
+        ->css(__DIR__ . '/resources/less/forum.less')
         ->js(__DIR__ . '/js/dist/forum.js'),
 
     new Extend\Locales(__DIR__ . '/resources/locale'),

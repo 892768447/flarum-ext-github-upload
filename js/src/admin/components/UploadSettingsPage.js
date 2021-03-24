@@ -19,7 +19,8 @@ export default class UploadSettingsPage extends ExtensionPage {
 
         // the checkboxes we need to watch and to save.
         // jsdelivr cdn 加速开关字段
-        this.checkboxes = ['jsdelivrcdn'];
+        // keepfiles 保留本地文件
+        this.checkboxes = ['jsdelivrcdn', 'keepfiles'];
 
         // get the saved settings from the database
         const settings = app.data.settings;
@@ -84,7 +85,16 @@ export default class UploadSettingsPage extends ExtensionPage {
                                     app.translator.trans('flarum-ext-github-upload.admin.settings.cdn_label2')
                                 )
                             ]),
-
+                            m('fieldset', [
+                                m('legend', app.translator.trans('flarum-ext-github-upload.admin.settings.keep_label')),
+                                Switch.component(
+                                    {
+                                        state: this.values.keepfiles() || false,
+                                        onchange: this.values.keepfiles,
+                                    },
+                                    app.translator.trans('flarum-ext-github-upload.admin.settings.keep_label')
+                                )
+                            ]),
                             Button.component(
                                 {
                                     type: 'submit',

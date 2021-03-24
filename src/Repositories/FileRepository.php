@@ -6,6 +6,7 @@ use Exception;
 use Flarum\Foundation\Paths;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
+use Illuminate\Container\Container;
 use Irony\Github\Upload\Contracts\UploadAdapter;
 use Irony\Github\Upload\File;
 use Milo\Github;
@@ -62,8 +63,28 @@ class FileRepository
     {
         // 检查上传错误
         $this->handleUploadError($file->getError());
-        // 移动到临时文件
-        $tempFile = tempnam($this->path . '/tmp', 'irony');
+
+        // 移动文件到 public/assets/files 文件夹中
+        $publicPath = Container::getInstance()->make(Paths::class)->public;
+        $searches = [];
+        $replaces = [];
+        if (is_link($filesDir = $publicPath . DIRECTORY_SEPARATOR . 'assets/files')) {
+            $searches[] = realpath($filesDir);
+            $replaces[] = 'assets/files';
+        }
+        if (!is_dir($filesDir)) {
+            mkdir($filesDir, 0777, true);
+        }
+        if (is_link($assetsDir = $publicPath . DIRECTORY_SEPARATOR . 'assets')) {
+            $searches[] = realpath($assetsDir);
+            $replaces[] = 'assets';
+        }
+        $searches = array_merge($searches, [$publicPath, DIRECTORY_SEPARATOR]);
+        $replaces = array_merge($replaces, ['', '/']);
+
+        // 移动文件
+        $tempFile1 = tempnam($filesDir, 'irony');
+        $tempFile = $tempFile1 . '_' . $file->getClientFilename();
         $file->moveTo($tempFile);
 
         // 构造新实例
@@ -76,7 +97,10 @@ class FileRepository
         $size = $this->settings->get('irony.github.upload.maxsize', FileRepository::DEFAULT_MAX_FILE_SIZE);
         if (($file->getSize() / 1024) > $size) {
             // 删除临时文件
-            unlink($file->getRealPath());
+            if (file_exists($tempFile1))
+                unlink($tempFile1);
+            if (file_exists($file->getRealPath()))
+                unlink($file->getRealPath());
             $this->handleUploadError(UPLOAD_ERR_FORM_SIZE);
         }
 
@@ -89,12 +113,25 @@ class FileRepository
         $fileData = file_get_contents($file->getRealPath());
         // 文件时间
         $fileDate = date('Y-m-d H:i:s', $file->getCTime());
-        // 删除临时文件
-        unlink($file->getRealPath());
+        // 文件 sha1
         $sha = sha1('blob ' . strlen($fileData) . chr(0) . $fileData);
         $existFile = $this->findBySha($sha);
+
+        // 数据库中存在或者不保留则删除
+        if ($existFile || strval($this->settings->get('irony.github.upload.keepfiles', 0)) !== '1') {
+            // 删除临时文件
+            $tempFile = null;
+            if (file_exists($tempFile1))
+                unlink($tempFile1);
+            if (file_exists($file->getRealPath()))
+                unlink($file->getRealPath());
+        }
+
+        // 数据库中已经记录则直接返回
         if ($existFile)
             return $existFile;
+        if (file_exists($tempFile1))
+            unlink($tempFile1);
 
         // 图片水印
 
@@ -130,6 +167,7 @@ class FileRepository
             $file = (new File())->forceFill([
                 'actor_id' => $actor->id,
                 'name' => $originalName,
+                'path' => str_replace($searches, $replaces, $tempFile),
                 'url' => $url,
                 'sha' => $response->content->sha,
                 'type' => $this->getFileType($mime),
