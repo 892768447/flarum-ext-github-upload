@@ -31,6 +31,6 @@ return [
         }
     },
     'down' => function (Builder $schema) {
-        $schema->dropIfExists('irony_github_files');
+        // $schema->dropIfExists('irony_github_files');
     },
 ];

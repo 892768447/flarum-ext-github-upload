@@ -157,10 +157,13 @@ class FileRepository
 
     protected function getFileType($mime)
     {
-        if ($mime == 'image/jpeg' || $mime == 'image/png' || $mime == 'image/gif' || $mime == 'image/svg+xml') {
+        if (strpos($mime, 'image/') === 0) {
             return 'image';
         }
-        if ($mime == 'video/mp4' || $mime == 'video/x-flv' || $mime == 'video/x-msvideo' || $mime == 'video/quicktime') {
+        if (strpos($mime, 'audio/') === 0) {
+            return 'audio';
+        }
+        if (strpos($mime, 'video/') === 0) {
             return 'video';
         }
         return 'file';

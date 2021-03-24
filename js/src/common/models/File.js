@@ -4,6 +4,7 @@ import fileToBBcode from '../fileToBBcode';
 
 export default class File extends mixin(Model, {
     url: Model.attribute('url'),
+    name: Model.attribute('name'),
     uuid: Model.attribute('sha'),
     type: Model.attribute('type'),
     created_at: Model.attribute('created_at'),

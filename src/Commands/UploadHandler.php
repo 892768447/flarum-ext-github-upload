@@ -46,13 +46,6 @@ class UploadHandler
         $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
             try {
                 $file = $this->files->uploadToGithub($file, $command->actor);
-//                if ($upload->type == 'image') {
-//                    return '[IMG]' . $upload->url . '[/IMG]';
-//                }
-//                if ($upload->type == 'video') {
-//                    return '[GITHUB-VIDEO]' . $upload->url . '[/GITHUB-VIDEO]';
-//                }
-//                return '[' . $upload->url . '](' . $upload->url . ')';
             } catch (Exception $e) {
                 //throw $e;
             }
