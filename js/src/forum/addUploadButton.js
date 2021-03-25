@@ -57,6 +57,6 @@ export default function () {
 
         this.$('textarea').bind('onunload', unloadHandler);
 
-        new PasteClipboard((files) => this.uploader.upload(files), this.$('textarea')[0]);
+        //new PasteClipboard((files) => this.uploader.upload(files), this.$('textarea')[0]);
     });
 }
